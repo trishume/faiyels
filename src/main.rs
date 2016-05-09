@@ -2,13 +2,10 @@
 extern crate find_folder;
 extern crate piston_window;
 extern crate vecmath;
-mod arc_button;
-mod gen_arc;
 
 pub fn main() {
-    use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget};
+    use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget, Button};
     use piston_window::{EventLoop, Glyphs, PistonWindow, OpenGL, UpdateEvent, WindowSettings};
-    use arc_button::ArcButton;
 
     // Conrod is backend agnostic. Here, we define the `piston_window` backend to use for our `Ui`.
     type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
@@ -53,21 +50,21 @@ pub fn main() {
                 // An ID for the background widget, upon which we'll place our custom button.
                 BACKGROUND,
                 // The WidgetId we'll use to plug our widget into the `Ui`.
-                ARC_BUTTON,
+                BUTTON,
             }
 
             // Create an instance of our custom widget.
-            ArcButton::new()
+            Button::new()
                 .color(conrod::color::rgb(0.0, 0.3, 0.1))
                 .middle_of(BACKGROUND)
                 .w_h(256.0, 256.0)
                 .label_color(conrod::color::WHITE)
-                .label("Circular Button")
+                .label("Button")
                 // This is called when the user clicks the button.
                 .react(|| println!("Click"))
                 // Add the widget to the conrod::Ui. This schedules the widget it to be
                 // drawn when we call Ui::draw.
-                .set(ARC_BUTTON, ui);
+                .set(BUTTON, ui);
         }));
 
         // Draws the whole Ui (in this case, just our widget) whenever a change occurs.
