@@ -1,14 +1,13 @@
 #[macro_use] extern crate conrod;
+#[macro_use] extern crate gfx;
 extern crate find_folder;
 extern crate piston_window;
 extern crate vecmath;
-mod arc_button;
-mod gen_arc;
+mod particle_renderer;
 
 pub fn main() {
-    use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget};
+    use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget, Button};
     use piston_window::{EventLoop, Glyphs, PistonWindow, OpenGL, UpdateEvent, WindowSettings};
-    use arc_button::ArcButton;
 
     // Conrod is backend agnostic. Here, we define the `piston_window` backend to use for our `Ui`.
     type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
@@ -21,7 +20,7 @@ pub fn main() {
     // PistonWindow<T = (), W: Window = GlutinWindow>. To change the Piston backend,
     // specify a different type in the let binding, e.g.
     // let window: PistonWindow<(), Sdl2Window>.
-    let mut window: PistonWindow = WindowSettings::new("Control Panel", [1200, 800])
+    let mut window: PistonWindow = WindowSettings::new("Control Panel", [1000, 1000])
         .opengl(opengl)
         .exit_on_esc(true)
         .build().unwrap();
@@ -39,38 +38,37 @@ pub fn main() {
 
     window.set_ups(60);
 
+    let mut particle_renderer = particle_renderer::ParticleRenderer::new(&mut window.factory, window.output_color.clone());
+
     while let Some(e) = window.next() {
         // Pass each `Event` to the `Ui`.
         ui.handle_event(&e);
 
         e.update(|_| ui.set_widgets(|ref mut ui| {
-
-            // Sets a color to clear the background with before the Ui draws our widget.
-            conrod::Canvas::new().color(conrod::color::DARK_RED).set(BACKGROUND, ui);
-
             // The `widget_ids` macro is a easy, safe way of generating unique `WidgetId`s.
             widget_ids! {
                 // An ID for the background widget, upon which we'll place our custom button.
-                BACKGROUND,
+                // BACKGROUND,
                 // The WidgetId we'll use to plug our widget into the `Ui`.
-                ARC_BUTTON,
+                BUTTON,
             }
 
             // Create an instance of our custom widget.
-            ArcButton::new()
+            Button::new()
                 .color(conrod::color::rgb(0.0, 0.3, 0.1))
-                .middle_of(BACKGROUND)
-                .w_h(256.0, 256.0)
+                .top_left_with_margins(10.0, 10.0)
+                .w_h(100.0, 50.0)
                 .label_color(conrod::color::WHITE)
-                .label("Circular Button")
+                .label("Button")
                 // This is called when the user clicks the button.
                 .react(|| println!("Click"))
                 // Add the widget to the conrod::Ui. This schedules the widget it to be
                 // drawn when we call Ui::draw.
-                .set(ARC_BUTTON, ui);
+                .set(BUTTON, ui);
         }));
 
+        window.draw_3d(&e, |w| particle_renderer.render(&mut w.encoder));
         // Draws the whole Ui (in this case, just our widget) whenever a change occurs.
-        window.draw_2d(&e, |c, g| ui.draw_if_changed(c, g));
+        window.draw_2d(&e, |c, g| ui.draw(c, g));
     }
 }

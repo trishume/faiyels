@@ -1,12 +1,15 @@
 # faiyels
 
-Faiyels is a source code visualizer that shows the lines of code of your program in a cool disk tree diagram.
-It is written in Rust using Conrod. It is also currently a barely implemented work in progress.
+Faiyels is a source code visualizer that shows the code in all the files of your program in a massive overview kind of like
+Sublime Text's minimap so you can see the size and texture of all the files.
+It is written in Rust using Gfx and Conrod. It is also currently a barely implemented work in progress.
 
 ## Roadmap
-- [ ] Draw cool recursive pie chart graph
-- [ ] Show data of a folder's files on the graph
-- [ ] Integrate line counting code from tokei to count lines
-- [ ] Drill down into subfolders of chart
-- [ ] Other metrics like kb, kb gzipped
-- [ ] Parallelize
+- [ ] Draw lots of rectangles
+- [ ] Draw lots of rectangles in the same places as a piece of text
+- [ ] Draw lots of rectangles in the same places as the text in a file
+- [ ] Add controls to navigate and zoom around
+- [ ] Draw many files at once in a useful arrangement
+- [ ] Colour the rectangles according to syntax highlighting
+- [ ] Add fancy animated transitions to different arrangements of rectangles
+- [ ] Show actual letters when you zoom in enough
