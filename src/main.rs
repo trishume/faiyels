@@ -1,7 +1,9 @@
 #[macro_use] extern crate conrod;
+#[macro_use] extern crate gfx;
 extern crate find_folder;
 extern crate piston_window;
 extern crate vecmath;
+mod particle_renderer;
 
 pub fn main() {
     use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget, Button};
@@ -18,7 +20,7 @@ pub fn main() {
     // PistonWindow<T = (), W: Window = GlutinWindow>. To change the Piston backend,
     // specify a different type in the let binding, e.g.
     // let window: PistonWindow<(), Sdl2Window>.
-    let mut window: PistonWindow = WindowSettings::new("Control Panel", [1200, 800])
+    let mut window: PistonWindow = WindowSettings::new("Control Panel", [1000, 1000])
         .opengl(opengl)
         .exit_on_esc(true)
         .build().unwrap();
@@ -36,19 +38,17 @@ pub fn main() {
 
     window.set_ups(60);
 
+    let mut particle_renderer = particle_renderer::ParticleRenderer::new(&mut window.factory, window.output_color.clone());
+
     while let Some(e) = window.next() {
         // Pass each `Event` to the `Ui`.
         ui.handle_event(&e);
 
         e.update(|_| ui.set_widgets(|ref mut ui| {
-
-            // Sets a color to clear the background with before the Ui draws our widget.
-            conrod::Canvas::new().color(conrod::color::DARK_RED).set(BACKGROUND, ui);
-
             // The `widget_ids` macro is a easy, safe way of generating unique `WidgetId`s.
             widget_ids! {
                 // An ID for the background widget, upon which we'll place our custom button.
-                BACKGROUND,
+                // BACKGROUND,
                 // The WidgetId we'll use to plug our widget into the `Ui`.
                 BUTTON,
             }
@@ -56,8 +56,8 @@ pub fn main() {
             // Create an instance of our custom widget.
             Button::new()
                 .color(conrod::color::rgb(0.0, 0.3, 0.1))
-                .middle_of(BACKGROUND)
-                .w_h(256.0, 256.0)
+                .top_left_with_margins(10.0, 10.0)
+                .w_h(100.0, 50.0)
                 .label_color(conrod::color::WHITE)
                 .label("Button")
                 // This is called when the user clicks the button.
@@ -67,7 +67,8 @@ pub fn main() {
                 .set(BUTTON, ui);
         }));
 
+        window.draw_3d(&e, |w| particle_renderer.render(&mut w.encoder));
         // Draws the whole Ui (in this case, just our widget) whenever a change occurs.
-        window.draw_2d(&e, |c, g| ui.draw_if_changed(c, g));
+        window.draw_2d(&e, |c, g| ui.draw(c, g));
     }
 }
