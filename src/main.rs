@@ -8,7 +8,7 @@ mod particle_renderer;
 
 pub fn main() {
     use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget, Button};
-    use piston_window::{EventLoop, Glyphs, PistonWindow, OpenGL, UpdateEvent, WindowSettings, Window};
+    use piston_window::{EventLoop, Glyphs, PistonWindow, OpenGL, UpdateEvent, WindowSettings, Window, Event, Input, Motion};
 
     // Conrod is backend agnostic. Here, we define the `piston_window` backend to use for our `Ui`.
     type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
@@ -44,6 +44,10 @@ pub fn main() {
     while let Some(e) = window.next() {
         // Pass each `Event` to the `Ui`.
         ui.handle_event(&e);
+
+        if let Event::Input(Input::Move(Motion::MouseScroll(x,y))) = e {
+            particle_renderer.scroll_canvas(x as f32,y as f32);
+        }
 
         e.update(|_| ui.set_widgets(|ref mut ui| {
             // The `widget_ids` macro is a easy, safe way of generating unique `WidgetId`s.
