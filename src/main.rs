@@ -3,11 +3,12 @@
 extern crate find_folder;
 extern crate piston_window;
 extern crate vecmath;
+extern crate cgmath;
 mod particle_renderer;
 
 pub fn main() {
     use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget, Button};
-    use piston_window::{EventLoop, Glyphs, PistonWindow, OpenGL, UpdateEvent, WindowSettings};
+    use piston_window::{EventLoop, Glyphs, PistonWindow, OpenGL, UpdateEvent, WindowSettings, Window};
 
     // Conrod is backend agnostic. Here, we define the `piston_window` backend to use for our `Ui`.
     type Backend = (<piston_window::G2d<'static> as conrod::Graphics>::Texture, Glyphs);
@@ -20,7 +21,7 @@ pub fn main() {
     // PistonWindow<T = (), W: Window = GlutinWindow>. To change the Piston backend,
     // specify a different type in the let binding, e.g.
     // let window: PistonWindow<(), Sdl2Window>.
-    let mut window: PistonWindow = WindowSettings::new("Control Panel", [1000, 1000])
+    let mut window: PistonWindow = WindowSettings::new("Control Panel", [1300, 1000])
         .opengl(opengl)
         .exit_on_esc(true)
         .build().unwrap();
@@ -38,7 +39,7 @@ pub fn main() {
 
     window.set_ups(60);
 
-    let mut particle_renderer = particle_renderer::ParticleRenderer::new(&mut window.factory, window.output_color.clone());
+    let mut particle_renderer = particle_renderer::ParticleRenderer::new(&mut window.factory, window.output_color.clone(), window.window.draw_size());
 
     while let Some(e) = window.next() {
         // Pass each `Event` to the `Ui`.

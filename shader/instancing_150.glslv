@@ -4,12 +4,15 @@ in vec2 a_Position;
 in vec2 a_Translate;
 in uint a_Color;
 
-uniform float u_Scale;
+uniform b_VsLocals {
+  mat4 u_Transform;
+  mat4 u_Proj;
+};
 
 out vec4 v_Color;
 
 void main() {
-    gl_Position = vec4((a_Position*u_Scale) + a_Translate, 0.0, 1.0);
+    gl_Position = u_Proj*u_Transform*vec4(a_Position + a_Translate, 0.0, 1.0);
 
     uint u8mask = 0x000000FFu;
     v_Color = vec4(float( a_Color >> 24),
