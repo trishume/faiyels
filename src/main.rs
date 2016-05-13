@@ -5,6 +5,7 @@ extern crate piston_window;
 extern crate vecmath;
 extern crate cgmath;
 mod particle_renderer;
+mod layout;
 
 pub fn main() {
     use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget, Button};
@@ -39,7 +40,10 @@ pub fn main() {
 
     window.set_ups(60);
 
-    let mut particle_renderer = particle_renderer::ParticleRenderer::new(&mut window.factory, window.output_color.clone(), window.window.draw_size());
+    let mut layout = Vec::new();
+    layout::layout_file_at(0.0,0.0,&mut layout);
+    let mut particle_renderer = particle_renderer::ParticleRenderer::new(
+        &mut window.factory, window.output_color.clone(), window.window.draw_size(), &layout);
 
     while let Some(e) = window.next() {
         // Pass each `Event` to the `Ui`.
