@@ -35,29 +35,6 @@ gfx_defines!{
     }
 }
 
-fn fill_instances(attributes: &mut [Instance], instances_per_length: u32) {
-    let offset = 1.0 + 0.4; // size + gap
-
-    let begin = 0.5;
-    let mut translate = [begin, begin];
-
-    let length = instances_per_length as usize;
-    for x in 0..length {
-        for y in 0..length {
-            let i = x*length + y;
-            attributes[i] = Instance {
-                translate: translate,
-                color: (((x*5) << 8) | ((y*5) << 16) | 0xFF) as u32
-            };
-            translate[1] += offset;
-        }
-        translate[1] = begin;
-        translate[0] += offset;
-    }
- }
-
-const MAX_INSTANCE_COUNT: usize = 2048;
-
 pub struct ParticleRenderer<R: gfx::Resources> {
     pso: gfx::PipelineState<R, pipe::Meta>,
     data: pipe::Data<R>,
@@ -70,34 +47,18 @@ pub struct ParticleRenderer<R: gfx::Resources> {
 }
 
 impl<R: gfx::Resources> ParticleRenderer<R> {
-    pub fn new<F: gfx::Factory<R>>(mut factory: &mut F, color: gfx::handle::RenderTargetView<R, gfx::format::Srgba8>, size: Size) -> Self {
+    pub fn new<F: gfx::Factory<R>>(mut factory: &mut F,
+        color: gfx::handle::RenderTargetView<R, gfx::format::Srgba8>, size: Size, data: &[Instance]) -> Self {
         use gfx::traits::FactoryExt;
 
-        let instances_per_length: u32 = 1000;
-        println!("{} instances per length", instances_per_length);
-        let instance_count = instances_per_length * instances_per_length;
+        let instance_count = data.len() as u32;
         println!("{} instances", instance_count);
         // assert!(instance_count as usize <= MAX_INSTANCE_COUNT);
 
-        let use_mapping = false;
-        let quad_instances = if use_mapping {
-            let buf = factory.create_buffer_dynamic(MAX_INSTANCE_COUNT, gfx::BufferRole::Vertex, gfx::Bind::empty()).unwrap();
-            let mut attributes = factory.map_buffer_writable(&buf);
-            fill_instances(attributes.to_mut_slice(), instances_per_length);
-            buf
-        }else {
-            let mut attributes = (0..instance_count).map(|_| Instance {
-                translate: [0.0, 0.0],
-                color: 0,
-            }).collect::<Vec<_>>();
-            fill_instances(&mut attributes, instances_per_length);
-            factory.create_buffer_const(&attributes, gfx::BufferRole::Vertex, gfx::Bind::empty()).unwrap()
-        };
+        let quad_instances = factory.create_buffer_const(data, gfx::BufferRole::Vertex, gfx::Bind::empty()).unwrap();
 
         let (quad_vertices, mut slice) = factory.create_vertex_buffer_with_slice(&QUAD_VERTICES, &QUAD_INDICES[..]);
         slice.instances = Some((instance_count, 0));
-
-
 
         ParticleRenderer {
             pso: factory.create_pipeline_simple(
@@ -116,8 +77,8 @@ impl<R: gfx::Resources> ParticleRenderer<R> {
             },
             slice: slice,
 
-            px_per_unit: 2.0,
-            translation: Vector2::new(0.0,0.0),
+            px_per_unit: 8.0,
+            translation: Vector2::new(0.0, size.height as f32),
             projection: cgmath::ortho(0.0, size.width as f32, 0.0, size.height as f32, -10.0, 10.0)
         }
     }

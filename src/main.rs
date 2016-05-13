@@ -4,7 +4,11 @@ extern crate find_folder;
 extern crate piston_window;
 extern crate vecmath;
 extern crate cgmath;
+extern crate walkdir;
 mod particle_renderer;
+mod layout;
+
+use std::path::Path;
 
 pub fn main() {
     use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget, Button};
@@ -39,7 +43,9 @@ pub fn main() {
 
     window.set_ups(60);
 
-    let mut particle_renderer = particle_renderer::ParticleRenderer::new(&mut window.factory, window.output_color.clone(), window.window.draw_size());
+    let layout = layout::layout_dir(Path::new("src"));
+    let mut particle_renderer = particle_renderer::ParticleRenderer::new(
+        &mut window.factory, window.output_color.clone(), window.window.draw_size(), &layout);
 
     while let Some(e) = window.next() {
         // Pass each `Event` to the `Ui`.
