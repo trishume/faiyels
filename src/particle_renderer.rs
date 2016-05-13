@@ -11,6 +11,7 @@ const QUAD_VERTICES: [Vertex; 4] = [
 ];
 
 const QUAD_INDICES: [u16; 6] = [0, 1, 2, 2, 3, 0];
+const INITIAL_SCALE: f32 = 8.0;
 
 gfx_defines!{
     vertex Vertex {
@@ -77,20 +78,24 @@ impl<R: gfx::Resources> ParticleRenderer<R> {
             },
             slice: slice,
 
-            px_per_unit: 8.0,
-            translation: Vector2::new(0.0, size.height as f32),
-            projection: cgmath::ortho(0.0, size.width as f32, 0.0, size.height as f32, -10.0, 10.0)
+            px_per_unit: INITIAL_SCALE,
+            translation: Vector2::new(-((size.width as f32)/2.0/INITIAL_SCALE), (size.height as f32)/2.0/INITIAL_SCALE),
+            projection: cgmath::ortho(-((size.width as f32)/2.0), (size.width as f32)/2.0, -((size.height as f32)/2.0), (size.height as f32)/2.0, -10.0, 10.0)
         }
     }
 
     fn compute_transform(&self) -> Matrix4<f32> {
         let scale = Matrix4::from_scale(self.px_per_unit);
         let translate = Matrix4::from_translation(self.translation.extend(0.0));
-        (self.projection * translate * scale)
+        (self.projection * scale * translate)
     }
 
     pub fn scroll_canvas(&mut self, x: f32, y: f32) {
-        self.translation = self.translation + Vector2::new(x,-y);
+        self.translation = self.translation + Vector2::new(x,-y)*(1.0/self.px_per_unit);
+    }
+
+    pub fn zoom(&mut self, factor: f32) {
+        self.px_per_unit *= factor;
     }
 
     pub fn render<C: gfx::CommandBuffer<R>>(&mut self, encoder: &mut gfx::Encoder<R, C>) {

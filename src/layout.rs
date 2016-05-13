@@ -43,7 +43,7 @@ pub fn layout_dir(path: &Path) -> Vec<Instance> {
         println!("{}", entry.path().display());
         if entry.file_type().is_file() {
             let f = BufReader::new(File::open(entry.path()).unwrap());
-            layout_file_at(f, x, -(entry.depth() as f32)*5.0, &mut v);
+            layout_file_at(f, x, 0.0, &mut v);
             x += 140.0;
         }
     }

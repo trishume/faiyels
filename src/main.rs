@@ -9,6 +9,7 @@ mod particle_renderer;
 mod layout;
 
 use std::path::Path;
+use std::env;
 
 pub fn main() {
     use conrod::{self, Colorable, Labelable, Positionable, Sizeable, Widget, Button};
@@ -43,7 +44,13 @@ pub fn main() {
 
     window.set_ups(60);
 
-    let layout = layout::layout_dir(Path::new("src"));
+    let args: Vec<String> = env::args().collect();
+    let path : &str = if args.len() >= 2 {
+        &args[1]
+    } else {
+        "src"
+    };
+    let layout = layout::layout_dir(Path::new(path));
     let mut particle_renderer = particle_renderer::ParticleRenderer::new(
         &mut window.factory, window.output_color.clone(), window.window.draw_size(), &layout);
 
@@ -61,7 +68,8 @@ pub fn main() {
                 // An ID for the background widget, upon which we'll place our custom button.
                 // BACKGROUND,
                 // The WidgetId we'll use to plug our widget into the `Ui`.
-                BUTTON,
+                ZOOM_IN_BUTTON,
+                ZOOM_OUT_BUTTON,
             }
 
             // Create an instance of our custom widget.
@@ -70,12 +78,17 @@ pub fn main() {
                 .top_left_with_margins(10.0, 10.0)
                 .w_h(100.0, 50.0)
                 .label_color(conrod::color::WHITE)
-                .label("Button")
-                // This is called when the user clicks the button.
-                .react(|| println!("Click"))
-                // Add the widget to the conrod::Ui. This schedules the widget it to be
-                // drawn when we call Ui::draw.
-                .set(BUTTON, ui);
+                .label("Zoom in")
+                .react(|| particle_renderer.zoom(1.5))
+                .set(ZOOM_IN_BUTTON, ui);
+            Button::new()
+                .color(conrod::color::rgb(0.0, 0.3, 0.1))
+                .right(10.0)
+                .w_h(100.0, 50.0)
+                .label_color(conrod::color::WHITE)
+                .label("Zoom out")
+                .react(|| particle_renderer.zoom(0.66))
+                .set(ZOOM_OUT_BUTTON, ui);
         }));
 
         window.draw_3d(&e, |w| particle_renderer.render(&mut w.encoder));
