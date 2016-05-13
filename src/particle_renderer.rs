@@ -77,8 +77,8 @@ impl<R: gfx::Resources> ParticleRenderer<R> {
             },
             slice: slice,
 
-            px_per_unit: 2.0,
-            translation: Vector2::new(0.0,0.0),
+            px_per_unit: 8.0,
+            translation: Vector2::new(0.0, size.height as f32),
             projection: cgmath::ortho(0.0, size.width as f32, 0.0, size.height as f32, -10.0, 10.0)
         }
     }
