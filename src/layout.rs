@@ -18,7 +18,7 @@ pub fn layout_file_at<T: BufRead>(input: T, x: f32, y: f32, v: &mut Vec<Instance
             if !c.is_whitespace() {
                 v.push(Instance {
                     translate: translate,
-                    color: ((column << 8) | 0xFF00FF) as u32
+                    color: 0xD08770FF
                 });
             }
 

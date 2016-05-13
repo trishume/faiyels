@@ -101,7 +101,7 @@ impl<R: gfx::Resources> ParticleRenderer<R> {
     pub fn render<C: gfx::CommandBuffer<R>>(&mut self, encoder: &mut gfx::Encoder<R, C>) {
         self.locals.transform = self.compute_transform().into();
         encoder.update_constant_buffer(&self.data.locals_cb, &self.locals);
-        encoder.clear(&self.data.out, [0.1, 0.2, 0.3, 1.0]);
+        encoder.clear(&self.data.out, [0.068, 0.076, 0.092, 1.0]);
         encoder.draw(&self.slice, &self.pso, &self.data);
     }
 }
