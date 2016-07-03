@@ -5,6 +5,7 @@ extern crate piston_window;
 extern crate vecmath;
 extern crate cgmath;
 extern crate walkdir;
+extern crate syntect;
 mod particle_renderer;
 mod layout;
 
